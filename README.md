@@ -3,5 +3,6 @@ This project is an implementation of MoveNet which is developed by Google. Inspi
 # Things on going:
 I am still testing the thresholds to make better results
 The deep learning way will be employed after the thresholds are all setting well, I am going to lead users to set up their own model which is at the end of the MoveNet,due to the different device and working environment.
+# LICENSES
 Copyright 2021 The TensorFlow Authors.
 Changed by Changyi Zhu.
