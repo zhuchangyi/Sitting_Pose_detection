@@ -492,7 +492,7 @@ def main():
         y = np.reshape(y,(17,1))
         z = np.reshape(z,(17,2))
         score = np.reshape(score,(17,1))
-        condition1=score[13] >0.2 or score [14] >0.2 or score[15] >0.2 or score[16] >0.2
+        condition1=score[13] >0.25 or score [14] >0.25 or score[15] >0.25 or score[16] >0.25
         for i in range(len(x)):
             if score[i] > 0.3:
                 cv2.circle(frame, (int(y[i] * 640), int(x[i] * 480)), 5, (0, 0, 255), -1)
@@ -510,10 +510,10 @@ def main():
                 print(default_Avg,'default_Avg')
                 count +=1
             if count>30:
-                for i in range(10):
+                for i in range(30):
                     if condition1 ==1:
                         count1 +=1
-                    if count1 ==6:
+                    if count1 ==20:
                         alarm()
 
 
