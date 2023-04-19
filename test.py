@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 from matplotlib.collections import LineCollection
 import matplotlib.patches as patches
 from csv_convert import write_to_csv
-from alarm import alarm
+from alarm import alarm,cancal_alarm
 # Some modules to display an animation using imageio.
 import imageio
 from IPython.display import HTML, display
@@ -451,35 +451,38 @@ def run_inference(movenet, image, crop_region, crop_size):
 
 
 def main():
-    count = 0
+    count = 0#for the ini of the pose
     keypoints_list = []
     cap = cv2.VideoCapture(0)
 
-    fps = cap.get(cv2.CAP_PROP_FPS)
+
     cap.set(cv2.CAP_PROP_FPS, 30)
+
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     while True:
         ret, frame = cap.read()
+        # fps = cap.get(cv2.CAP_PROP_FPS)
+        # print(fps, 'fps')
 
         #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         #frame = cv2.resize(frame, (256, 256))
-        tframe=frame.copy()#frame是numpy类型，tframe是tensor类型
-        tframe = tf.image.resize_with_pad(tf.expand_dims(tframe, axis=0), 256, 256)
-        tframe = tf.cast(tframe, dtype=tf.int32)
-        print(tframe.shape,'tframe.shape')
+        # tframe=frame.copy()#frame是numpy类型，tframe是tensor类型
+        # tframe = tf.image.resize_with_pad(tf.expand_dims(tframe, axis=0), 256, 256)
+        # tframe = tf.cast(tframe, dtype=tf.int32)
+        # print(tframe.shape,'tframe.shape')
         print(frame.shape, 'frame.shape')
-        keypoints_with_scores =movenet(tframe)
-        num_frames, image_height, image_width, _ = fps,480,640,3
+        #keypoints_with_scores =movenet(tframe)
+        image_height, image_width, _ = 480,640,3
+
         crop_region = init_crop_region(image_height, image_width)
 
         #bar = display(progress(0, num_frames - 1), display_id=True)
-        for frame_idx in range(int(num_frames)):
-            keypoints_with_scores = run_inference(
-                movenet, tframe[frame_idx], crop_region,
-                crop_size=[256, 256])
-            crop_region = determine_crop_region(
-                keypoints_with_scores, image_height, image_width)
+        #for frame_idx in range(int(num_frames)):
+        #print(frame_idx, 'frame_idx')
+
+        keypoints_with_scores = run_inference(movenet, frame, crop_region,crop_size=[256, 256])
+        #crop_region = determine_crop_region(keypoints_with_scores, image_height, image_width)
             #bar.update(progress(frame_idx, num_frames - 1))
         # print(type(frame),'frame')
         # print(type(tframe), 'tframe')
@@ -492,12 +495,13 @@ def main():
         y = np.reshape(y,(17,1))
         z = np.reshape(z,(17,2))
         score = np.reshape(score,(17,1))
-        condition1=score[13] >0.25 or score [14] >0.25 or score[15] >0.25 or score[16] >0.25
+        condition1=score[13] >0.2 or score [14] >0.2 or score[15] >0.2 or score[16] >0.2#detect legs and hip
         for i in range(len(x)):
             if score[i] > 0.3:
                 cv2.circle(frame, (int(y[i] * 640), int(x[i] * 480)), 5, (0, 0, 255), -1)
         if ret:
-            count1 = 0
+            count1 = 0#condition1 detection cheak
+
             count2 =0
             if count <= 29:
                 keypoints_list.append(z)
@@ -509,12 +513,18 @@ def main():
                 default_Avg=np.mean(keypoints_list,axis=0)
                 print(default_Avg,'default_Avg')
                 count +=1
-            if count>30:
+            if count>30:#有问题需要修改
                 for i in range(30):
+                    print(count1, 'count1')
                     if condition1 ==1:
                         count1 +=1
-                    if count1 ==20:
-                        alarm()
+                if count1 ==20:
+                    alarm()
+                    if condition1 ==0:
+                        count1 =0
+                        cancal_alarm()
+
+
 
 
 
