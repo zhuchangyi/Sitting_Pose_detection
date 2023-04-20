@@ -1,6 +1,5 @@
 import tensorflow as tf
 import tensorflow_hub as hub
-from tensorflow_docs.vis import embed
 import numpy as np
 import cv2
 import time
@@ -10,9 +9,11 @@ from matplotlib.collections import LineCollection
 import matplotlib.patches as patches
 from csv_convert import write_to_csv
 from alarm import alarm,cancal_alarm
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 # Some modules to display an animation using imageio.
-import imageio
-from IPython.display import HTML, display
+#import imageio
+#from IPython.display import HTML, display
 
 
 
@@ -185,22 +186,6 @@ def draw_prediction_on_image(
         image_from_plot, dsize=(output_image_width, output_image_height),
          interpolation=cv2.INTER_CUBIC)
   return image_from_plot
-
-def to_gif(images, fps):
-  """Converts image sequence (4D numpy array) to gif."""
-  imageio.mimsave('./animation.gif', images, fps=fps)
-  return embed.embed_file('./animation.gif')
-
-def progress(value, max=100):
-  return HTML("""
-      <progress
-          value='{value}'
-          max='{max}',
-          style='width: 100%'
-      >
-          {value}
-      </progress>
-  """.format(value=value, max=max))
 
 #model_name = "movenet_lightning"
 
@@ -451,6 +436,7 @@ def run_inference(movenet, image, crop_region, crop_size):
 
 
 def main():
+
     count = 0#for the ini of the pose
     keypoints_list = []
     cap = cv2.VideoCapture(0)
@@ -526,13 +512,9 @@ def main():
 
 
 
-
-
             print(keypoints_with_scores)
             #write_to_csv(np.reshape(keypoints_with_scores[0, 0, :, 0:3],(17,3)), 'keypoints_with_scores.csv')
-
-
-            time.sleep(.100)
+            #time.sleep(.100)
             print(keypoints_with_scores.shape,"keypoints_with_scores.shape")
         cv2.imshow('frame', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
