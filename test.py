@@ -7,8 +7,9 @@ import time
 from matplotlib import pyplot as plt
 from matplotlib.collections import LineCollection
 import matplotlib.patches as patches
+from set_inital_pose import pose_inital
 from csv_convert import write_to_csv
-from alarm import alarm,cancal_alarm
+from alarm import alarm
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 # Some modules to display an animation using imageio.
@@ -187,58 +188,13 @@ def draw_prediction_on_image(
          interpolation=cv2.INTER_CUBIC)
   return image_from_plot
 
-#model_name = "movenet_lightning"
 
-# if "tflite" in model_name:
-#   if "movenet_lightning_f16" in model_name:
-#     !wget -q -O model.tflite https://tfhub.dev/google/lite-model/movenet/singlepose/lightning/tflite/float16/4?lite-format=tflite
-#     input_size = 192
-#   elif "movenet_thunder_f16" in model_name:
-#     !wget -q -O model.tflite https://tfhub.dev/google/lite-model/movenet/singlepose/thunder/tflite/float16/4?lite-format=tflite
-#     input_size = 256
-#   elif "movenet_lightning_int8" in model_name:
-#     !wget -q -O model.tflite https://tfhub.dev/google/lite-model/movenet/singlepose/lightning/tflite/int8/4?lite-format=tflite
-#     input_size = 192
-#   elif "movenet_thunder_int8" in model_name:
-#     !wget -q -O model.tflite https://tfhub.dev/google/lite-model/movenet/singlepose/thunder/tflite/int8/4?lite-format=tflite
-#     input_size = 256
-#   else:
-#     raise ValueError("Unsupported model name: %s" % model_name)
-#
-#   # Initialize the TFLite interpreter
-#   interpreter = tf.lite.Interpreter(model_path="model.tflite")
-#   interpreter.allocate_tensors()
-#
-#   def movenet(input_image):
-#     """Runs detection on an input image.
-#
-#     Args:
-#       input_image: A [1, height, width, 3] tensor represents the input image
-#         pixels. Note that the height/width should already be resized and match the
-#         expected input resolution of the model before passing into this function.
-#
-#     Returns:
-#       A [1, 1, 17, 3] float numpy array representing the predicted keypoint
-#       coordinates and scores.
-#     """
-#     # TF Lite format expects tensor type of uint8.
-#     input_image = tf.cast(input_image, dtype=tf.uint8)
-#     input_details = interpreter.get_input_details()
-#     output_details = interpreter.get_output_details()
-#     interpreter.set_tensor(input_details[0]['index'], input_image.numpy())
-#     # Invoke inference.
-#     interpreter.invoke()
-#     # Get the model prediction.
-#     keypoints_with_scores = interpreter.get_tensor(output_details[0]['index'])
-#     return keypoints_with_scores
-#
-# else:
 model_name = "movenet_thunder"
 if "movenet_lightning" in model_name:
     module = hub.load("https://tfhub.dev/google/movenet/singlepose/lightning/4")
     input_size = 192
 elif "movenet_thunder" in model_name:
-    module = hub.load("https://tfhub.dev/google/movenet/singlepose/thunder/4")
+    module = hub.load("movenet_singlepose_thunder_4")
     input_size = 256
 else:
     raise ValueError("Unsupported model name: %s" % model_name)
@@ -437,13 +393,12 @@ def run_inference(movenet, image, crop_region, crop_size):
 
 def main():
 
-    count = 0#for the ini of the pose
+    count = 0       #for the ini of the pose
+    count1 = 0  # condition1 detection cheak
+    count2= 0
     keypoints_list = []
     cap = cv2.VideoCapture(0)
-
-
     cap.set(cv2.CAP_PROP_FPS, 30)
-
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     while True:
@@ -482,40 +437,43 @@ def main():
         z = np.reshape(z,(17,2))
         score = np.reshape(score,(17,1))
         condition1=score[13] >0.2 or score [14] >0.2 or score[15] >0.2 or score[16] >0.2#detect legs and hip
+        print(condition1,'condition1')
         for i in range(len(x)):
             if score[i] > 0.3:
                 cv2.circle(frame, (int(y[i] * 640), int(x[i] * 480)), 5, (0, 0, 255), -1)
-        if ret:
-            count1 = 0#condition1 detection cheak
 
-            count2 =0
-            if count <= 29:
-                keypoints_list.append(z)
-                count += 1
-            if count==30:
-                #print(keypoints_list,'keypoints_list')
+        if count <= 29:
+            keypoints_list.append(z)
+            count += 1
+        if count == 30:
+            # print(keypoints_list,'keypoints_list')
 
-                #write_to_csv(keypoints_list, "keypoints_list.csv")
-                default_Avg=np.mean(keypoints_list,axis=0)
-                print(default_Avg,'default_Avg')
-                count +=1
-            if count>30:#有问题需要修改
-                for i in range(30):
-                    print(count1, 'count1')
-                    if condition1 ==1:
-                        count1 +=1
-                if count1 ==20:
-                    alarm()
-                    if condition1 ==0:
-                        count1 =0
-                        cancal_alarm()
+            # write_to_csv(keypoints_list, "keypoints_list.csv")
+            default_Avg = np.mean(keypoints_list, axis=0)
+            print(default_Avg, 'default_Avg')
+            count += 1
 
+        #思路2，利用数组加循环计数，类似求keypoints_list的平均值
+        if condition1 ==1 and count2 ==0:
+            count2 =1
+            count1 =1
+            print(count1, 'count1')
+        if count2 !=0:
+            count2 += 1
+        if count1 != 0 and condition1 == 1 and count2 < 30:
+            count1 += 1
+            print(count1, 'count1')
+            if count1 == 20:
+                alarm()
+                count1 =0
+                count2 = 0
+        if count2 == 29:
+            count2 = 0
 
-
-            print(keypoints_with_scores)
-            #write_to_csv(np.reshape(keypoints_with_scores[0, 0, :, 0:3],(17,3)), 'keypoints_with_scores.csv')
-            #time.sleep(.100)
-            print(keypoints_with_scores.shape,"keypoints_with_scores.shape")
+        print(keypoints_with_scores)
+        #write_to_csv(np.reshape(keypoints_with_scores[0, 0, :, 0:3],(17,3)), 'keypoints_with_scores.csv')
+        #time.sleep(.100)
+        print(keypoints_with_scores.shape,"keypoints_with_scores.shape")
         cv2.imshow('frame', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
