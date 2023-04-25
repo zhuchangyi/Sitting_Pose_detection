@@ -7,7 +7,7 @@ import time
 from matplotlib import pyplot as plt
 from matplotlib.collections import LineCollection
 import matplotlib.patches as patches
-from set_inital_pose import pose_inital
+#from set_inital_pose import pose_inital
 from csv_convert import write_to_csv
 from alarm import alarm
 import os
@@ -395,7 +395,9 @@ def main():
 
     count = 0       #for the ini of the pose
     count1 = 0  # condition1 detection cheak
-    count2= 0
+    count2 = 0
+    count3 = 0
+    count4 = 0
     keypoints_list = []
     cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FPS, 30)
@@ -436,8 +438,9 @@ def main():
         y = np.reshape(y,(17,1))
         z = np.reshape(z,(17,2))
         score = np.reshape(score,(17,1))
-        condition1=score[13] >0.2 or score [14] >0.2 or score[15] >0.2 or score[16] >0.2#detect legs and hip
-        print(condition1,'condition1')
+        # condition1 = score[13] >0.4 or score [14] >0.4 or score[15] >0.4 or score[16] >0.4#detect legs and hip
+        # condition2 = abs((y[1]- default_Avg[1][1]))
+        # print(condition1,'condition1')
         for i in range(len(x)):
             if score[i] > 0.3:
                 cv2.circle(frame, (int(y[i] * 640), int(x[i] * 480)), 5, (0, 0, 255), -1)
@@ -451,28 +454,55 @@ def main():
             # write_to_csv(keypoints_list, "keypoints_list.csv")
             default_Avg = np.mean(keypoints_list, axis=0)
             print(default_Avg, 'default_Avg')
-            count += 1
 
-        #思路2，利用数组加循环计数，类似求keypoints_list的平均值
-        if condition1 ==1 and count2 ==0:
-            count2 =1
-            count1 =1
-            print(count1, 'count1')
-        if count2 !=0:
-            count2 += 1
-        if count1 != 0 and condition1 == 1 and count2 < 30:
-            count1 += 1
-            print(count1, 'count1')
-            if count1 == 20:
-                alarm()
-                count1 =0
+
+            write_to_csv(default_Avg, "default_Avg.csv")
+            count += 1
+        if count > 30:
+            print (x[1], 'x[1]')
+            print(default_Avg[1][0], 'default_Avg[1][0]')
+            condition1 = score[13] >0.4 or score [14] >0.4 or score[15] >0.4 or score[16] >0.4#detect legs and hip
+            condition2 = abs((x[1]- default_Avg[1][0]))>0.035 or abs((x[1]-x[2])/(y[1]-y[2]))>0.26
+            print(condition1, 'condition1')
+            print(condition2, 'condition2')
+
+
+        #思路2，利用数组加循环计数，类似求keypoints_list的平均值,
+            if condition1 ==1 and count2 ==0:
+                count2 =1
+                count1 =1
+                print(count1, 'count1')
+            if count2 !=0:
+                count2 += 1
+            if count1 != 0 and condition1 == 1 and count2 < 30:
+                count1 += 1
+                print(count1, 'count1')
+                if count1 == 20:
+                    alarm()
+                    count1 = 0
+                    count2 = 0
+            if count2 == 29:
                 count2 = 0
-        if count2 == 29:
-            count2 = 0
+
+            if condition2 ==1 and count4 ==0:
+                count4 =1
+                count3 =1
+                print(count3, 'count3')
+            if count4 !=0:
+                count4 += 1
+            if count3 != 0 and condition2 == 1 and count4 < 30:
+                count3 += 1
+                print(count3, 'count3')
+                if count3 == 20:
+                    alarm()
+                    count3 = 0
+                    count4 = 0
+            if count4 == 29:
+                count4 = 0
 
         print(keypoints_with_scores)
         #write_to_csv(np.reshape(keypoints_with_scores[0, 0, :, 0:3],(17,3)), 'keypoints_with_scores.csv')
-        #time.sleep(.100)
+        time.sleep(.100)
         print(keypoints_with_scores.shape,"keypoints_with_scores.shape")
         cv2.imshow('frame', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
