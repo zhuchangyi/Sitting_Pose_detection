@@ -441,18 +441,13 @@ def main():
     count = 0#for the ini of the pose
     keypoints_list = []
     cap = cv2.VideoCapture(0)
-
-
-
     cap.set(cv2.CAP_PROP_FPS, 30)
-
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    image_height, image_width, _ = 480, 640, 3
+    crop_region = init_crop_region(image_height, image_width)
     while True:
         ret, frame = cap.read()
-        # fps = cap.get(cv2.CAP_PROP_FPS)
-        # print(fps, 'fps')
-
         #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         #frame = cv2.resize(frame, (256, 256))
         # tframe=frame.copy()#frame是numpy类型，tframe是tensor类型
@@ -461,10 +456,6 @@ def main():
         # print(tframe.shape,'tframe.shape')
         print(frame.shape, 'frame.shape')
         #keypoints_with_scores =movenet(tframe)
-        image_height, image_width, _ = 480,640,3
-
-        crop_region = init_crop_region(image_height, image_width)
-
         #bar = display(progress(0, num_frames - 1), display_id=True)
         #for frame_idx in range(int(num_frames)):
         #print(frame_idx, 'frame_idx')
@@ -490,14 +481,18 @@ def main():
         #     if score[i] > 0.3:
         #         cv2.circle(frame, (int(y[i] * 640), int(x[i] * 480)), 5, (0, 0, 255), -1)
 
-        output_img=(draw_prediction_on_image(frame,keypoints_with_scores,crop_region=determine_crop_region(
-      keypoints_with_scores, image_height, image_width),close_figure=False, output_image_height=300))
+        #output_img=(draw_prediction_on_image(frame,keypoints_with_scores,crop_region=determine_crop_region(
+      #keypoints_with_scores, image_height, image_width),close_figure=False, output_image_height=300))
         #output_img = cv2.cvtColor(output_img, cv2.COLOR_RGB2BGR)
         # output_img=np.array(output_img)
         # print(output_img.shape,'output_img.shape')
-        output = np.stack(np.array(output_img), axis=0)
+        #output = np.stack(np.array(output_img), axis=0)
         #crop_region = determine_crop_region(keypoints_with_scores, image_height, image_width)
         if ret:
+            crop_region = determine_crop_region(
+                keypoints_with_scores, image_height, image_width)
+            output_img = draw_prediction_on_image(frame, keypoints_with_scores, crop_region, close_figure=False, output_image_height=300)
+            #output = np.stack(np.array(output_img), axis=0)
             count1 = 0#condition1 detection cheak
 
             count2 =0
@@ -506,7 +501,6 @@ def main():
                 count += 1
             if count==30:
                 #print(keypoints_list,'keypoints_list')
-
                 #write_to_csv(keypoints_list, "keypoints_list.csv")
                 default_Avg=np.mean(keypoints_list,axis=0)
                 print(default_Avg,'default_Avg')
