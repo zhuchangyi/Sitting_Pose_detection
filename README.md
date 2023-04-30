@@ -1,9 +1,10 @@
 # Setting_Pose_detection
 This project is an implementation of MoveNet which is developed by Google. Inspired by monolesan's fix_posture projected,we are going to set more thresholds and use the deep-learning method.  
 ## Setting thresholds  
-Use the first 30 frame collected by camera to set the average baseline of each keypoint.  
-Set the thresholds by comparing the eye position with average value and the tan() value of two eyes is limited, also the lower body is not allowed to show up.  
-In order to reduce the error rate of the MoveNet model, we create few counters for multi-frame detection  
+* Use the first 30 frame collected by camera to set the average baseline of each keypoint.  
+* Set the thresholds by comparing the eye position with average value and the tan() value of two eyes is limited, also the lower body is not allowed to show up.  
+* Pop-up notification for wrong pose.  
+* In order to reduce the error rate of the MoveNet model, we create few counters for multi-frame detection.  
 
 ## Deep-learning method
 
