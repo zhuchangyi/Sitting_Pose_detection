@@ -7,7 +7,6 @@ import time
 from matplotlib import pyplot as plt
 from matplotlib.collections import LineCollection
 import matplotlib.patches as patches
-#from set_inital_pose import pose_inital
 from csv_convert import write_to_csv
 from alarm import alarm
 import os
@@ -502,7 +501,7 @@ def main():
 
         print(keypoints_with_scores)
         #write_to_csv(np.reshape(keypoints_with_scores[0, 0, :, 0:3],(17,3)), 'keypoints_with_scores.csv')
-        time.sleep(.100)
+        #time.sleep(.100)
         print(keypoints_with_scores.shape,"keypoints_with_scores.shape")
         cv2.imshow('frame', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
