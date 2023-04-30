@@ -7,7 +7,7 @@ This project is an implementation of MoveNet which is developed by Google. Inspi
 * In order to reduce the error rate of the MoveNet model, we create few counters for multi-frame detection.  
 
 ## Deep-learning method
-
+* Testing......
 # Things on going:  
 - [x] Implemente Movenet to generate keypoints  
 - [x] Visualization keypoints on real-time by opencv  
