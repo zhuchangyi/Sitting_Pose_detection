@@ -422,7 +422,7 @@ def main():
     data = np.array(data)
     print(data,"data")
     print(data.shape,"data.shape")
-    # write_to_csv(data)
+    #write_to_csv(data)
 
     # 当一切完成时，释放捕获
     cap.release()
