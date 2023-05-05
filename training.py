@@ -109,7 +109,54 @@ plt.title('Model accuracy')
 plt.ylabel('accuracy')
 plt.xlabel('epoch')
 plt.legend(['TRAIN', 'VAL'], loc='lower right')
+plt.savefig('accuracy.png')
 plt.show()
 
 loss, accuracy = model.evaluate(X_test, y_test)
 
+class_names = ['0', '1']
+
+def plot_confusion_matrix(cm, classes,
+                          normalize=False,
+                          title='Confusion matrix',
+                          cmap=plt.cm.Blues):
+  """Plots the confusion matrix."""
+  if normalize:
+    cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+    print("Normalized confusion matrix")
+  else:
+    print('Confusion matrix, without normalization')
+
+  plt.imshow(cm, interpolation='nearest', cmap=cmap)
+  plt.title(title)
+  plt.colorbar()
+  tick_marks = np.arange(len(classes))
+  plt.xticks(tick_marks, classes, rotation=55)
+  plt.yticks(tick_marks, classes)
+  fmt = '.2f' if normalize else 'd'
+  thresh = cm.max() / 2.
+  for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+    plt.text(j, i, format(cm[i, j], fmt),
+              horizontalalignment="center",
+              color="white" if cm[i, j] > thresh else "black")
+
+  plt.ylabel('True label')
+  plt.xlabel('Predicted label')
+  plt.tight_layout()
+
+# Classify pose in the TEST dataset using the trained model
+y_pred = model.predict(X_test)
+
+# Convert the prediction result to class name
+y_pred_label = [class_names[i] for i in np.argmax(y_pred, axis=1)]
+y_true_label = [class_names[i] for i in np.argmax(y_test, axis=1)]
+
+# Plot the confusion matrix
+cm = confusion_matrix(np.argmax(y_test, axis=1), np.argmax(y_pred, axis=1))
+plot_confusion_matrix(cm,
+                      class_names,normalize=True,
+                      title ='Confusion Matrix of Pose Classification Model')
+plt.show()
+# Print the classification report
+print('\nClassification Report:\n', classification_report(y_true_label,
+                                                          y_pred_label))
