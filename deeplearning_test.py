@@ -2,6 +2,7 @@ import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
 import cv2
+from alarm import alarm
 from tensorflow import keras
 from matplotlib import pyplot as plt
 from matplotlib.collections import LineCollection
@@ -232,7 +233,8 @@ def tfmodel_load(keypoints_with_scores):
     return output_data
 
 def main():
-
+    count = 0
+    count1 = 0
     cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FPS, 30)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -254,9 +256,33 @@ def main():
 
         keypoints = np.reshape(np.reshape(np.reshape(keypoints_with_scores[0, 0, :, :], (17, 3)), (-1,)), (1, 51))
         #model_load(keypoints)
-        labels = tfmodel_load(keypoints)
-        print(labels, 'labels')
+        prob = tfmodel_load(keypoints)
+        print(prob, 'prob')
+        if prob[0][0] > 0.5:
+            label = 'wrong'
+            print('wrong')
+        else:
+            print('right')
+            label = 'right'
+
+        if label == 'wrong' and count == 0:
+            count = 1
+            count1 = 1
+            print(count1, 'count1')
+        if count != 0:
+            count += 1
+        if count1 != 0 and label == 'wrong' and count < 30:
+            count1 += 1
+            print(count1, 'count1')
+            if count1 == 15:
+                alarm()
+                count1 = 0
+                count = 0
+        if count == 29:
+            count = 0
+        cv2.putText(frame, label, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
         cv2.imshow('frame', frame)
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
