@@ -1,4 +1,4 @@
-# Setting_Pose_detection
+# Sitting_Pose_detection
 This project is an implementation of MoveNet which is developed by Google. Inspired by monolesan's fix_posture projecte,we are going to set more thresholds and use the deep-learning method.  
 ## Setting thresholds  
 * Use the first 30 frame collected by camera to set the average baseline of each keypoint.  
