@@ -34,6 +34,6 @@ This project is an implementation of MoveNet which is developed by Google. Inspi
 - [x] Build fully connected network training and testing 
 The deep learning method we propose is going to lead users to set up their own model which is at the end of the MoveNet network, due to the different device and working environment.
 # LICENSES
-Copyright 2021 The TensorFlow Authors.  
-Changed by Changyi Zhu.
+Copyright (c) 2021 The TensorFlow Authors
+Copyright (c) 2023 Changyi zhu
 
