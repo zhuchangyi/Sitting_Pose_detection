@@ -53,14 +53,13 @@ def landmarks_to_embedding(landmarks_and_scores):
 inputs = tf.keras.Input(shape=(51))
 embedding = landmarks_to_embedding(inputs)
 
-layer = keras.layers.Dense(256, activation=tf.nn.relu6)(embedding)
-layer = keras.layers.Dropout(0.1)(layer)
-layer = keras.layers.Dense(128, activation=tf.nn.relu6)(layer)
-layer = keras.layers.Dropout(0.1)(layer)
+
+layer = keras.layers.Dense(128, activation=tf.nn.relu6)(embedding)
+#layer = keras.layers.Dropout(0.1)(layer)
 layer = keras.layers.Dense(64, activation=tf.nn.relu6)(layer)
-layer = keras.layers.Dropout(0.1)(layer)
+#layer = keras.layers.Dropout(0.1)(layer)
 layer = keras.layers.Dense(32, activation=tf.nn.relu6)(layer)
-layer = keras.layers.Dropout(0.1)(layer)
+#layer = keras.layers.Dropout(0.1)(layer)
 layer = keras.layers.Dense(16, activation=tf.nn.relu6)(layer)
 #layer = keras.layers.Dropout(0.2)(layer)
 outputs = keras.layers.Dense(2, activation="sigmoid")(layer)
@@ -86,7 +85,7 @@ earlystopping = keras.callbacks.EarlyStopping(monitor='val_accuracy',
 # Start training
 history = model.fit(X_train, y_train,
                     epochs=200,
-                    batch_size=16,
+                    batch_size=32,
                     validation_data=(X_val, y_val),
                     callbacks=[checkpoint, earlystopping])
 
