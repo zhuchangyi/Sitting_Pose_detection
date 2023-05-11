@@ -16,6 +16,7 @@ This project is an implementation of MoveNet which is developed by Google. Inspi
 * Add more datas(according to the wrong classification of previous step ) and retrain the model.  
 * Run deeplearning_test.py for demo.
 * ![img.png](img.png)
+* ![img_2.png](img_2.png)
 ### Dataset collecting suggestion
 * Collect the data by running the 'dataset_generater.py'.
 * The data will be saved in the corrent directory.
