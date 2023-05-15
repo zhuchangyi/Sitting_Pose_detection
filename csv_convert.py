@@ -1,6 +1,8 @@
 import csv
 import numpy as np
 import os
+import tkinter as tk
+from tkinter import filedialog
 import pandas as pd
 
 def folder_create():
@@ -34,19 +36,24 @@ def write_to_csv(data):
         merge_csv()
 
 def merge_csv():
-    folder_path = "datas/train/"
-    csv_files = [f for f in os.listdir(folder_path) if f.endswith('.csv')]
+    root = tk.Tk()
+    root.withdraw()
+    selected_files = filedialog.askopenfilenames(title="Select CSV files to merge", initialdir="datas/train/", filetypes=[("CSV files", "*.csv")])
+    #csv_files = [f for f in os.listdir(folder_path) if f.endswith('.csv')]
 
    
     dfs = []
-    for file in csv_files:
-        file_path = os.path.join(folder_path, file)
-        df = pd.read_csv(file_path)
+    for file in selected_files:
+        df = pd.read_csv(file)
         dfs.append(df)
 
     # 将所有 DataFrame 合并为一个，并保存到 CSV 文件
     merged_df = pd.concat(dfs, ignore_index=True)
-    merged_df.to_csv("datas/train/train.csv", index=False)
-# data =np.random.rand(1,51)
-# write_to_csv(data)
+    filename = input("Enter a filename for the merged CSV file: ")
+    if not filename.endswith(".csv"):
+        filename += ".csv"
+    output_file = os.path.join("datas/train/", filename)
+    merged_df.to_csv(output_file, index=False)
+#data =np.random.rand(1,51)
+#write_to_csv(data)
 #merge_csv()
