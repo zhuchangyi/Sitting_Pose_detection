@@ -1,3 +1,5 @@
 *.js linguist-language=Python
 *.yaml linguist-language=Python
 *.xml linguist-language=Python
+*.png linguist-language=Python
+*.csv linguist-language=Python
